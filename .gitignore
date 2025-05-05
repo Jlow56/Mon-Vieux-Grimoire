@@ -1,2 +1,9 @@
+# dependencies
 /node_modules
+
+
 .env
+
+# local env files
+.vscode/*
+!.vscode/extensions.json
