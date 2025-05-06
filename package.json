@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Mon Vieux Grimoire backend",
   "license": "ISC",
-  "author": "",
+  "author": "jlow",
   "type": "commonjs",
   "main": "server.js",
   "scripts": {
