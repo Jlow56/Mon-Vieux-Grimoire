@@ -1,9 +1,13 @@
 # dependencies
 /node_modules
 
-
+#config
+/config/.env
 .env
 
 # local env files
 .vscode/*
 !.vscode/extensions.json
+
+# git
+.gitignore
