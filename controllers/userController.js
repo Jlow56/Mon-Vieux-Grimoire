@@ -2,9 +2,11 @@ const User = require("../models/User.js");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
-dotenv.config();
-
 class UserController {
+
+  async findUserByEmail(email) {
+    return User.findOne({ email });
+  }
 
   async findUser(req, res) {
     const { email } = req.body;
@@ -43,7 +45,7 @@ class UserController {
     }
   }
 
-  async createUser(req, res) {
+  async signup(req, res) {
     try {
       const { email, password } = req.body;
 

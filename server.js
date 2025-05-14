@@ -1,12 +1,7 @@
 const http = require('http');
 const app = require('./app');
-
-const cors = require('cors');
-let corsOptions = {
-    origin : ['*'],
- }
- 
-app.use(cors(corsOptions))
+const dotenv = require('dotenv');
+dotenv.config();
 
 const normalizePort = val => {
   const port = parseInt(val, 10);
