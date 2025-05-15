@@ -3,7 +3,6 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
 class UserController {
-
   async findUserByEmail(email) {
     return User.findOne({ email });
   }
@@ -21,28 +20,55 @@ class UserController {
     }
   }
 
-  async login(req, res) {
-    const { email, password } = req.body;
-    try {
-      const user = await this.findUserByEmail(email);
+  // async login(req, res) {
+  //   const { email, password } = req.body;
+  //   try {
+  //     const user = await this.findUserByEmail(email);
 
-      if (!user) {
-        return res.status(401).json({ error: "Invalid credentials" });
-      }
+  //     if (!user) {
+  //       return res.status(401).json({ error: "Invalid credentials" });
+  //     }
 
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (!isPasswordValid) {
-        return res.status(401).json({ error: "Invalid credentials" });
-      }
+  //     const isPasswordValid = await bcrypt.compare(password, user.password);
+  //     if (!isPasswordValid) {
+  //       return res.status(401).json({ error: "Invalid credentials" });
+  //     }
 
-      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-        expiresIn: "1h",
-      });
+  //     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+  //       expiresIn: "24h",
+  //     });
 
-      return res.status(200).json({ token });
-    } catch (error) {
-      res.status(500).json({ error: "Internal server error" });
-    }
+  //     return res.status(200).json({ token });
+  //   } catch (error) {
+  //     console.error(error);
+  //     res.status(500).json({ error: "Internal server error" });
+  //   }
+  // }
+
+  async login(req, res, next) {
+    User.findOne({ email: req.body.email })
+      .then((user) => {
+        if (!user) {
+          return res.status(401).json({ error: "Utilisateur non trouvé !" });
+        }
+        bcrypt
+          .compare(req.body.password, user.password)
+          .then((valid) => {
+            if (!valid) {
+              return res
+                .status(401)
+                .json({ error: "Mot de passe incorrect !" });
+            }
+            res.status(200).json({
+              userId: user._id,
+              token: jwt.sign({ userId: user._id }, process.env.TOKEN_SECRET, {
+                expiresIn: "24h",
+              }),
+            });
+          })
+          .catch((error) => res.status(500).json({ error }));
+      })
+      .catch((error) => res.status(500).json({ error }));
   }
 
   async signup(req, res) {
