@@ -14,7 +14,7 @@ const normalizePort = val => {
   }
   return false;
 };
-//Port 4000 dans le frontend
+//Port 3000 dans le frontend
 const port = normalizePort(process.env.PORT ||'4000');
 app.set('port', port);
 

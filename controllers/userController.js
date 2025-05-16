@@ -20,55 +20,29 @@ class UserController {
     }
   }
 
-  // async login(req, res) {
-  //   const { email, password } = req.body;
-  //   try {
-  //     const user = await this.findUserByEmail(email);
+  async login(req, res) {
+    const { email, password } = req.body;
+    try {
+      const user = await this.findUserByEmail(email);
 
-  //     if (!user) {
-  //       return res.status(401).json({ error: "Invalid credentials" });
-  //     }
+      if (!user) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
 
-  //     const isPasswordValid = await bcrypt.compare(password, user.password);
-  //     if (!isPasswordValid) {
-  //       return res.status(401).json({ error: "Invalid credentials" });
-  //     }
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
 
-  //     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-  //       expiresIn: "24h",
-  //     });
+      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+        expiresIn: "24h",
+      });
 
-  //     return res.status(200).json({ token });
-  //   } catch (error) {
-  //     console.error(error);
-  //     res.status(500).json({ error: "Internal server error" });
-  //   }
-  // }
-
-  async login(req, res, next) {
-    User.findOne({ email: req.body.email })
-      .then((user) => {
-        if (!user) {
-          return res.status(401).json({ error: "Utilisateur non trouvé !" });
-        }
-        bcrypt
-          .compare(req.body.password, user.password)
-          .then((valid) => {
-            if (!valid) {
-              return res
-                .status(401)
-                .json({ error: "Mot de passe incorrect !" });
-            }
-            res.status(200).json({
-              userId: user._id,
-              token: jwt.sign({ userId: user._id }, process.env.TOKEN_SECRET, {
-                expiresIn: "24h",
-              }),
-            });
-          })
-          .catch((error) => res.status(500).json({ error }));
-      })
-      .catch((error) => res.status(500).json({ error }));
+      return res.status(200).json({ token });
+    } catch (error) {
+      console.error("LOGIN ERROR:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
   }
 
   async signup(req, res) {
@@ -78,18 +52,18 @@ class UserController {
       const bcryptSalt = 10;
       const hashedPassword = await bcrypt.hash(password, bcryptSalt);
 
-      const newUser = new User({
-        email,
-        password: hashedPassword,
-      });
-
+      const newUser = new User({ email, password: hashedPassword,});
       await newUser.save();
 
       res.status(201).json({ message: "User created successfully" });
     } catch (error) {
+       if (error.name === 'ValidationError' && error.errors.email) {
+      return res.status(409).json({ error: "Cet e-mail est déjà utilisé." });
+    }
       res.status(500).json({ error: "Internal server error" });
     }
   }
 }
 
 module.exports = new UserController();
+  
