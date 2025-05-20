@@ -1,8 +1,8 @@
 const express = require('express');
 const connectDB = require('./config/database'); 
 const cors = require('cors');
-const userRouter = require('./router/user');
-// const bookRoutes = require('./routes/book');
+const userRouter = require('./routes/user');
+const bookRoutes = require('./routes/book');
 
 const app = express();
 connectDB();

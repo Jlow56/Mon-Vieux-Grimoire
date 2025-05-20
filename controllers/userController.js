@@ -58,7 +58,7 @@ class UserController {
       res.status(201).json({ message: "User created successfully" });
     } catch (error) {
        if (error.name === 'ValidationError' && error.errors.email) {
-      return res.status(409).json({ error: "Cet e-mail est déjà utilisé." });
+      return res.status(409 ).json({ error: "Cet e-mail est déjà utilisé." });
     }
       res.status(500).json({ error: "Internal server error" });
     }
