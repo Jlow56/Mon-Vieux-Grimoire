@@ -1,6 +1,7 @@
 const Book = require("../models/book.js");
-const fs = require("fs");
+const fs = require("fs/promises");
 const path = require("path");
+const { calculateAverageRating } = require("../utils/averageRating.js");
 
 exports.getAllBooks = async (req, res, next) => {
   try {
@@ -22,34 +23,29 @@ exports.getBookById = async (req, res, next) => {
 };
 
 exports.createBook = async (req, res, next) => {
-   console.log(' createBook bookController.js = ▶️  POST /api/books — createBook appelé', {
-    auth: req.auth.userId,
-    hasFile: !!req.file,
-    bodyBook: req.body.book?.slice?.(0,50)
-  });  
   try {
-        const data = JSON.parse(req.body.book);
-        delete data._id;
-        delete data._userId;
+    const data = JSON.parse(req.body.book);
+    delete data._id;
+    delete data._userId;
 
     const exists = await Book.findOne({
       title: data.title,
       author: data.author,
     });
     if (exists) {
-        if (req.file) {
-            await fs
-            .unlink(path.join(__dirname, "../images", req.file.filename))
-            .catch(() => {});
-        }
+      if (req.file) {
+        await fs
+          .unlink(path.join(__dirname, "../images", req.file.filename))
+          .catch(() => {});
+      }
       return res.status(400).json({ error: "Livre déjà existant" });
     }
     const book = new Book({
-            ...data,
-            userId: req.auth.userId,
-            imageUrl: `${req.protocol}://${req.get("host")}/images/${
-            req.file.filename
-        }`,
+      ...data,
+      userId: req.auth.userId,
+      imageUrl: `${req.protocol}://${req.get("host")}/images/${
+        req.file.filename
+      }`,
     });
     const saved = await book.save();
     res.status(201).json({ message: "Livre enregistré", bookId: saved._id });
@@ -77,15 +73,15 @@ exports.updateBook = async (req, res, next) => {
 
     // Supprime l’ancienne image si nouvelle fournie :contentReference[oaicite:7]{index=7}
     if (req.file && book.imageUrl) {
-        const old = book.imageUrl.split("/images/")[1];
-        await fs.unlink(path.join(__dirname, "../images", old)).catch(() => {});
+      const old = book.imageUrl.split("/images/")[1];
+      await fs.unlink(path.join(__dirname, "../images", old)).catch(() => {});
     }
 
     await Book.updateOne({ _id: book._id }, payload);
     res.json({ message: "Livre modifié" });
-    } catch (err) {
-        next(err);
-    }
+  } catch (err) {
+    next(err);
+  }
 };
 
 exports.deleteBook = async (req, res, next) => {
@@ -96,32 +92,37 @@ exports.deleteBook = async (req, res, next) => {
       return res.status(403).json({ error: "Non autorisé" });
 
     if (book.imageUrl) {
-        const file = book.imageUrl.split("/images/")[1];
-        await fs.unlink(path.join(__dirname, "../images", file)).catch(() => {});
+      const file = book.imageUrl.split("/images/")[1];
+      await fs.unlink(path.join(__dirname, "../images", file)).catch(() => {});
     }
     await Book.deleteOne({ _id: book._id });
     res.json({ message: "Livre supprimé" });
-    } catch (err) {
-        next(err);
-    }
+  } catch (err) {
+    next(err);
+  }
 };
 
 exports.rateBook = async (req, res, next) => {
   try {
     const rating = Number(req.body.rating);
+
     if (rating < 0 || rating > 5) {
       return res.status(400).json({ error: "Note entre 0 et 5" });
     }
 
     const book = await Book.findById(req.params.id);
     if (!book) return res.status(404).json({ error: "Livre non trouvé" });
+
     if (book.ratings.some((r) => r.userId === req.auth.userId)) {
       return res.status(400).json({ error: "Vous avez déjà noté ce livre" });
     }
 
     book.ratings.push({ userId: req.auth.userId, grade: rating });
-    book.calculateAverageRating();
+
+    book.averageRating = calculateAverageRating(book.ratings);
+
     await book.save();
+
     res.status(201).json(book);
   } catch (err) {
     next(err);

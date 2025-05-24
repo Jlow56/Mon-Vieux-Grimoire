@@ -34,11 +34,11 @@ class UserController {
         return res.status(401).json({ error: "Invalid credentials" });
       }
 
-      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
         expiresIn: "24h",
       });
 
-      return res.status(200).json({ token });
+      return res.status(200).json({ userId: user._id, token });
     } catch (error) {
       console.error("LOGIN ERROR:", error);
       res.status(500).json({ error: "Internal server error" });
