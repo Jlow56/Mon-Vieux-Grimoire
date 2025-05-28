@@ -21,7 +21,7 @@ const resize = (req, res, next) => {
   const outputPath = path.join(IMAGE_DIR, filename);
 
   sharp(req.file.buffer)
-    .resize({ width: 500 })
+    .resize({ width: 410, height : 570 })
     .toBuffer()
     .then(buffer => {
       fs.writeFile(outputPath, buffer, err => {
