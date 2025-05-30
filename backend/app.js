@@ -1,7 +1,7 @@
-const express   = require('express');
+const express = require('express');
 const connectDB = require('./config/database');
-const cors      = require('cors');
-const path      = require('path');
+const cors = require('cors');
+const path = require('path');
 
 const userRouter = require('./router/user');
 const bookRoutes = require('./router/book');

@@ -26,12 +26,12 @@ class UserController {
       const user = await this.findUserByEmail(email);
 
       if (!user) {
-        return res.status(401).json({ error: "Invalid credentials" });
+        return res.status(401).json({ error: "Mail ou mot de passe incorrect" });
       }
 
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
-        return res.status(401).json({ error: "Invalid credentials" });
+        return res.status(401).json({ error: "Mail ou mot de passe incorrect" });
       }
 
       const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {

@@ -1,4 +1,4 @@
-const Book = require("../models/book.js");
+const Book = require("../models/Book.js");
 const fs = require("fs/promises");
 const path = require("path");
 const { calculateAverageRating } = require("../utils/averageRating.js");
@@ -40,6 +40,9 @@ exports.createBook = async (req, res, next) => {
       }
       return res.status(400).json({ error: "Livre déjà existant" });
     }
+    if (isNaN(data.year)) {
+      return res.status(400).json({ error: "L'année doit être un nombre valide." });
+    }
     const book = new Book({
       ...data,
       userId: req.auth.userId,
@@ -51,12 +54,23 @@ exports.createBook = async (req, res, next) => {
     res.status(201).json({ message: "Livre enregistré", bookId: saved._id });
   } catch (error) {
     console.log("catch bookController.js = CREATE BOOK ERROR:", error);
+
     next(error);
   }
 };
 
 exports.updateBook = async (req, res, next) => {
   try {
+     const parsedBook = req.file ? JSON.parse(req.body.book) : req.body;
+    // Vérification des champs obligatoires 
+     if (!parsedBook.title || !parsedBook.author || !parsedBook.year || !parsedBook.genre) {
+      return res.status(400).json({ error: "Tous les champs sont obligatoires." });
+    }
+    // Vérification que l'année est un int
+    if (isNaN(parsedBook.year) || parsedBook.year === "") {
+      return res.status(400).json({ error: "L'année doit être un nombre valide." });
+    } 
+    
     const payload = req.file
       ? {
           ...JSON.parse(req.body.book),
@@ -65,16 +79,18 @@ exports.updateBook = async (req, res, next) => {
           }`,
         }
       : { ...req.body };
-
+    console.log("payload:", payload);    
     const book = await Book.findById(req.params.id);
     if (!book) return res.status(404).json({ error: "Livre non trouvé" });
     if (book.userId !== req.auth.userId)
       return res.status(403).json({ error: "Non autorisé" });
 
-    // Supprime l’ancienne image si nouvelle fournie :contentReference[oaicite:7]{index=7}
+    // Supprime l’ancienne image si nouvelle fournie 
     if (req.file && book.imageUrl) {
       const old = book.imageUrl.split("/images/")[1];
       await fs.unlink(path.join(__dirname, "../images", old)).catch(() => {});
+    }else {
+      return res.status(400).json({ error: "Aucune image fournie" });
     }
 
     await Book.updateOne({ _id: book._id }, payload);
