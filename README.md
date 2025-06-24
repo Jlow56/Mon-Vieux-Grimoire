@@ -4,7 +4,7 @@ Projet 6 du parcours Développeur Web OpenClassrooms.
 
 ## 🚀 Présentation
 
-"Mon Vieux Grimoire" est une plateforme de présentation et de notation de livres d'occasion. Ce dépôt contient le **backend** de l’application, développé en **Node.js** avec **Express** et une base de données **MongoDB**.
+"Mon Vieux Grimoire" est une plateforme de présentation et de notation de livres. Ce dépôt contient le **backend** de l’application, développé en **Node.js** avec **Express** et une base de données **MongoDB**.
 
 ## 🧩 Fonctionnalités principales
 
