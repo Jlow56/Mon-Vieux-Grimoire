@@ -32,16 +32,16 @@ function SignIn({ setUser }) {
       });
       if (!response?.data?.token) {
         setNotification({ error: true, message: 'Une erreur est survenue' });
-        console.log('Something went wrong during signing in: ', response);
+        if (process.env.NODE_ENV === "development") {  };
       } else {
         storeInLocalStorage(response.data.token, response.data.userId);
         setUser(response.data);
         navigate('/');
       }
     } catch (err) {
-      console.log(err);
+      if (process.env.NODE_ENV === "development") {  };
       setNotification({ error: true, message: err.message });
-      console.log('Some error occured during signing in: ', err);
+      if (process.env.NODE_ENV === "development") {  };
     } finally {
       setIsLoading(false);
     }
@@ -59,13 +59,13 @@ function SignIn({ setUser }) {
         },
       });
       if (!response?.data) {
-        console.log('Something went wrong during signing up: ', response);
+        if (process.env.NODE_ENV === "development") {  };
         return;
       }
       setNotification({ error: false, message: 'Votre compte a bien été créé, vous pouvez vous connecter' });
     } catch (err) {
       setNotification({ error: true, message: err.message });
-      console.log('Some error occured during signing up: ', err);
+      if (process.env.NODE_ENV === "development") {  };
     } finally {
       setIsLoading(false);
     }

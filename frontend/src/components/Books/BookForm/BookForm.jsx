@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import React, { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as PropTypes from 'prop-types';
@@ -10,13 +9,22 @@ import styles from './BookForm.module.css';
 import { updateBook, addBook } from '../../../lib/common';
 
 function BookForm({ book, validate }) {
-  const userRating = book ? book.ratings.find((elt) => elt.userId === localStorage.getItem('userId'))?.grade : 0;
+  const userRating = book
+    ? book.ratings.find((elt) => elt.userId === localStorage.getItem('userId'))?.grade
+    : 0;
 
   const [rating, setRating] = useState(0);
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
 
   const navigate = useNavigate();
+
   const {
-    register, watch, formState, handleSubmit, reset,
+    register,
+    watch,
+    formState,
+    handleSubmit,
+    reset,
   } = useForm({
     defaultValues: useMemo(() => ({
       title: book?.title,
@@ -25,10 +33,12 @@ function BookForm({ book, validate }) {
       genre: book?.genre,
     }), [book]),
   });
+
   useEffect(() => {
-    reset(book);
-  }, [book]);
-  const file = watch(['file']);
+    if (book) reset(book);
+  }, [book, reset]);
+
+  const file = watch('file');
   const [filePreview] = useFilePreview(file);
 
   useEffect(() => {
@@ -37,65 +47,82 @@ function BookForm({ book, validate }) {
 
   useEffect(() => {
     if (!book && formState.dirtyFields.rating) {
-      const rate = document.querySelector('input[name="rating"]:checked').value;
-      setRating(parseInt(rate, 10));
-      formState.dirtyFields.rating = false;
+      const rate = document.querySelector('input[name="rating"]:checked')?.value;
+      if (rate) setRating(parseInt(rate, 10));
     }
-  }, [formState]);
+  }, [formState, book]);
 
   const onSubmit = async (data) => {
-    // When we create a new book
+    setError('');
+    setMessage('');
+
     if (!book) {
-      if (!data.file[0]) {
-        alert('Vous devez ajouter une image');
+      if (!data.file?.[0]) {
+        setError('Vous devez ajouter une image');
+        return;
       }
-      if (!data.rating) {
-        /* eslint-disable no-param-reassign */
-        data.rating = 0;
-        /* eslint-enable no-param-reassign */
-      }
-      const newBook = await addBook(data);
+
+      const payload = {
+        ...data,
+        rating: data.rating || 0,
+      };
+
+      const newBook = await addBook(payload);
+
       if (!newBook.error) {
+        setMessage(newBook.message);
         validate(true);
       } else {
-        alert(newBook.message);
+        setError(newBook.message);
       }
     } else {
       const updatedBook = await updateBook(data, data.id);
+
       if (!updatedBook.error) {
         navigate('/');
       } else {
-        alert(updatedBook.message);
+        setError(updatedBook.message);
       }
     }
   };
 
   const readOnlyStars = !!book;
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={styles.Form}>
+
       <input type="hidden" id="id" {...register('id')} />
+
+      {error && <p className={styles.Error}>{error}</p>}
+      {message && <p className={styles.Message}>{message}</p>}
+
       <label htmlFor="title">
         <p>Titre du livre</p>
         <input type="text" id="title" {...register('title')} />
       </label>
+
       <label htmlFor="author">
         <p>Auteur</p>
         <input type="text" id="author" {...register('author')} />
       </label>
+
       <label htmlFor="year">
         <p>Année de publication</p>
         <input type="text" id="year" {...register('year')} />
       </label>
+
       <label htmlFor="genre">
         <p>Genre</p>
         <input type="text" id="genre" {...register('genre')} />
       </label>
+
       <label htmlFor="rate">
         <p>Note</p>
         <div className={styles.Stars}>
           {generateStarsInputs(rating, register, readOnlyStars)}
         </div>
       </label>
+
       <label htmlFor="file">
         <p>Visuel</p>
         <div className={styles.AddImage}>
@@ -110,10 +137,10 @@ function BookForm({ book, validate }) {
               <p>Ajouter une image</p>
             </>
           )}
-
         </div>
         <input {...register('file')} type="file" id="file" />
       </label>
+
       <button type="submit">Publier</button>
     </form>
   );
@@ -129,10 +156,12 @@ BookForm.propTypes = {
     year: PropTypes.number,
     imageUrl: PropTypes.string,
     genre: PropTypes.string,
-    ratings: PropTypes.arrayOf(PropTypes.shape({
-      userId: PropTypes.string,
-      grade: PropTypes.number,
-    })),
+    ratings: PropTypes.arrayOf(
+      PropTypes.shape({
+        userId: PropTypes.string,
+        grade: PropTypes.number,
+      }),
+    ),
     averageRating: PropTypes.number,
   }),
   validate: PropTypes.func,
@@ -142,4 +171,5 @@ BookForm.defaultProps = {
   book: null,
   validate: null,
 };
+
 export default BookForm;

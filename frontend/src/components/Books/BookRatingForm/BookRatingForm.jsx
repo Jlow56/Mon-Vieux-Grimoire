@@ -9,44 +9,58 @@ import { useUser } from '../../../lib/customHooks';
 import { rateBook } from '../../../lib/common';
 
 function BookRatingForm({
-  rating, setRating, userId, setBook, id, userRated,
+  rating,
+  setRating,
+  userId,
+  setBook,
+  id,
+  userRated,
 }) {
   const { connectedUser, auth } = useUser();
   const navigate = useNavigate();
+
   const { register, formState, handleSubmit } = useForm({
     mode: 'onChange',
-    defaultValues: {
-      rating: 0,
-    },
+    defaultValues: { rating: 0 },
   });
+
   useEffect(() => {
     if (formState.dirtyFields.rating) {
-      const rate = document.querySelector('input[name="rating"]:checked').value;
-      setRating(parseInt(rate, 10));
-      formState.dirtyFields.rating = false;
+      const rate = document.querySelector('input[name="rating"]:checked')?.value;
+      if (rate) setRating(parseInt(rate, 10));
     }
-  }, [formState]);
+  }, [formState, setRating]);
+
   const onSubmit = async () => {
     if (!connectedUser || !auth) {
       navigate(APP_ROUTES.SIGN_IN);
+      return;
     }
+
     const update = await rateBook(id, userId, rating);
-    console.log(update);
-    if (update) {
-      // eslint-disable-next-line no-underscore-dangle
+
+    if (update && !update.error) {
       setBook({ ...update, id: update._id });
-    } else {
-      alert(update);
+      return;
     }
+
+    // erreur silencieuse (UI à implémenter si besoin)
   };
+
   return (
     <div className={styles.BookRatingForm}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <p>{rating > 0 ? 'Votre Note' : 'Notez cet ouvrage'}</p>
+
         <div className={styles.Stars}>
-          {!userRated ? generateStarsInputs(rating, register) : displayStars(rating)}
+          {!userRated
+            ? generateStarsInputs(rating, register)
+            : displayStars(rating)}
         </div>
-        {!userRated ? <button type="submit">Valider</button> : null}
+
+        {!userRated && (
+          <button type="submit">Valider</button>
+        )}
       </form>
     </div>
   );
