@@ -11,6 +11,7 @@ function AddBook() {
   const navigate = useNavigate();
   const { connectedUser, auth, userLoading } = useUser();
   const [created, setCreated] = useState(false);
+
   useEffect(() => {
     if (!userLoading) {
       if (!connectedUser || !auth) {
@@ -36,9 +37,7 @@ function AddBook() {
             <img src={bookAdd} alt="Livre ajouté" />
             <Link to="/" className="button">Retour à l&apos;accueil</Link>
           </div>
-
         )}
-
       </div>
     </div>
   );

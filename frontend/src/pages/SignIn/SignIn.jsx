@@ -19,6 +19,7 @@ function SignIn({ setUser }) {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [notification, setNotification] = useState({ error: false, message: '' });
+
   const signIn = async () => {
     try {
       setIsLoading(true);
@@ -32,16 +33,13 @@ function SignIn({ setUser }) {
       });
       if (!response?.data?.token) {
         setNotification({ error: true, message: 'Une erreur est survenue' });
-        if (process.env.NODE_ENV === "development") {  };
       } else {
         storeInLocalStorage(response.data.token, response.data.userId);
         setUser(response.data);
         navigate('/');
       }
     } catch (err) {
-      if (process.env.NODE_ENV === "development") {  };
       setNotification({ error: true, message: err.message });
-      if (process.env.NODE_ENV === "development") {  };
     } finally {
       setIsLoading(false);
     }
@@ -59,17 +57,16 @@ function SignIn({ setUser }) {
         },
       });
       if (!response?.data) {
-        if (process.env.NODE_ENV === "development") {  };
         return;
       }
       setNotification({ error: false, message: 'Votre compte a bien été créé, vous pouvez vous connecter' });
     } catch (err) {
       setNotification({ error: true, message: err.message });
-      if (process.env.NODE_ENV === "development") {  };
     } finally {
       setIsLoading(false);
     }
   };
+
   const errorClass = notification.error ? styles.Error : null;
   return (
     <div className={`${styles.SignIn} container`}>
@@ -123,9 +120,9 @@ function SignIn({ setUser }) {
             bg-gray-800  text-white hover:bg-gray-800"
             onClick={signUp}
           >
-            { isLoading ? <div className="mr-2 w-5 h-5 border-l-2 rounded-full animate-spin" /> : null }
+            {isLoading ? <div className="mr-2 w-5 h-5 border-l-2 rounded-full animate-spin" /> : null}
             <span>
-              {'S\'inscrire'}
+              S&apos;inscrire
             </span>
           </button>
         </div>

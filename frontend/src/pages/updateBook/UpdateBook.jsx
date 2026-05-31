@@ -14,6 +14,7 @@ function UpdateBook() {
   const navigate = useNavigate();
   const { connectedUser, auth, userLoading } = useUser();
   const [created, setCreated] = useState(false);
+
   useEffect(() => {
     if (!userLoading) {
       if (!connectedUser || !auth) {
@@ -21,6 +22,7 @@ function UpdateBook() {
       }
     }
   }, [userLoading]);
+
   useEffect(() => {
     async function getItem() {
       const data = await getBook(params.id);

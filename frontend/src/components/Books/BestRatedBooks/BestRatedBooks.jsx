@@ -12,7 +12,7 @@ function BestRatedBooks() {
 
   return (
     <section className={`content-container ${styles.BestRatedBooks}`}>
-      <h2>Les mieux notés</h2>
+      <h2>Les mieux notÃƒÆ’Ã‚Â©s</h2>
       <div className={styles.List}>
         {bestRatedBooksContent}
       </div>

@@ -86,34 +86,41 @@ function BookForm({ book, validate }) {
     }
   };
 
+  const idReg = register('id');
+  const titleReg = register('title');
+  const authorReg = register('author');
+  const yearReg = register('year');
+  const genreReg = register('genre');
+  const fileReg = register('file');
+
   const readOnlyStars = !!book;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={styles.Form}>
 
-      <input type="hidden" id="id" {...register('id')} />
+      <input type="hidden" id="id" name={idReg.name} ref={idReg.ref} onChange={idReg.onChange} onBlur={idReg.onBlur} />
 
       {error && <p className={styles.Error}>{error}</p>}
       {message && <p className={styles.Message}>{message}</p>}
 
       <label htmlFor="title">
         <p>Titre du livre</p>
-        <input type="text" id="title" {...register('title')} />
+        <input type="text" id="title" name={titleReg.name} ref={titleReg.ref} onChange={titleReg.onChange} onBlur={titleReg.onBlur} />
       </label>
 
       <label htmlFor="author">
         <p>Auteur</p>
-        <input type="text" id="author" {...register('author')} />
+        <input type="text" id="author" name={authorReg.name} ref={authorReg.ref} onChange={authorReg.onChange} onBlur={authorReg.onBlur} />
       </label>
 
       <label htmlFor="year">
         <p>Année de publication</p>
-        <input type="text" id="year" {...register('year')} />
+        <input type="text" id="year" name={yearReg.name} ref={yearReg.ref} onChange={yearReg.onChange} onBlur={yearReg.onBlur} />
       </label>
 
       <label htmlFor="genre">
         <p>Genre</p>
-        <input type="text" id="genre" {...register('genre')} />
+        <input type="text" id="genre" name={genreReg.name} ref={genreReg.ref} onChange={genreReg.onChange} onBlur={genreReg.onBlur} />
       </label>
 
       <label htmlFor="rate">
@@ -138,7 +145,7 @@ function BookForm({ book, validate }) {
             </>
           )}
         </div>
-        <input {...register('file')} type="file" id="file" />
+        <input type="file" id="file" name={fileReg.name} ref={fileReg.ref} onChange={fileReg.onChange} onBlur={fileReg.onBlur} />
       </label>
 
       <button type="submit">Publier</button>

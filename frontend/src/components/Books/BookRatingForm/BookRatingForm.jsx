@@ -40,11 +40,9 @@ function BookRatingForm({
     const update = await rateBook(id, userId, rating);
 
     if (update && !update.error) {
+      // eslint-disable-next-line no-underscore-dangle
       setBook({ ...update, id: update._id });
-      return;
     }
-
-    // erreur silencieuse (UI à implémenter si besoin)
   };
 
   return (

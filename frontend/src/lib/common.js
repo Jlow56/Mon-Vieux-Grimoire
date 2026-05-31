@@ -29,7 +29,7 @@ export async function getAuthenticatedUser() {
     }
     return { authenticated: true, user: { userId, token } };
   } catch (err) {
-    if (process.env.NODE_ENV === "development") { if (process.env.NODE_ENV === "development") {  } };
+    console.error(err);
     return defaultReturnObject;
   }
 }
@@ -40,11 +40,10 @@ export async function getBooks() {
       method: 'GET',
       url: `${API_ROUTES.BOOKS}`,
     });
-    // eslint-disable-next-line array-callback-return
     const books = formatBooks(response.data);
     return books;
   } catch (err) {
-    if (process.env.NODE_ENV === "development") { if (process.env.NODE_ENV === "development") {  } };
+    console.error(err);
     return [];
   }
 }
@@ -60,7 +59,7 @@ export async function getBook(id) {
     book.id = book._id;
     return book;
   } catch (err) {
-    if (process.env.NODE_ENV === "development") { if (process.env.NODE_ENV === "development") {  } };
+    console.error(err);
     return null;
   }
 }
@@ -73,10 +72,11 @@ export async function getBestRatedBooks() {
     });
     return formatBooks(response.data);
   } catch (e) {
-    if (process.env.NODE_ENV === "development") { if (process.env.NODE_ENV === "development") {  } };
+    console.error(e);
     return [];
   }
 }
+
 export async function deleteBook(id) {
   try {
     await axios.delete(`${API_ROUTES.BOOKS}/${id}`, {
@@ -86,7 +86,7 @@ export async function deleteBook(id) {
     });
     return true;
   } catch (err) {
-    if (process.env.NODE_ENV === "development") { if (process.env.NODE_ENV === "development") {  } };
+    console.error(err);
     return false;
   }
 }
@@ -108,7 +108,7 @@ export async function rateBook(id, userId, rating) {
     book.id = book._id;
     return book;
   } catch (e) {
-    if (process.env.NODE_ENV === "development") { if (process.env.NODE_ENV === "development") {  } };
+    console.error(e);
     return e.message;
   }
 }
@@ -141,7 +141,7 @@ export async function addBook(data) {
       },
     });
   } catch (err) {
-    if (process.env.NODE_ENV === "development") { if (process.env.NODE_ENV === "development") {  } };
+    console.error(err);
     return { error: true, message: err.message };
   }
 }
@@ -157,7 +157,7 @@ export async function updateBook(data, id) {
     year: data.year,
     genre: data.genre,
   };
-  if (process.env.NODE_ENV === "development") {  };
+
   if (data.file[0]) {
     newData = new FormData();
     newData.append('book', JSON.stringify(book));
@@ -177,7 +177,7 @@ export async function updateBook(data, id) {
     });
     return newBook;
   } catch (err) {
-    if (process.env.NODE_ENV === "development") { if (process.env.NODE_ENV === "development") {  } };
+    console.error(err);
     return { error: true, message: err.message };
   }
 }

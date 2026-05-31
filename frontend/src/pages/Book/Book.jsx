@@ -63,7 +63,7 @@ function Book() {
         <p>a bien été supprimé</p>
         <img src={BookDeleteImage} alt="book deleted" />
         <Link to="/">
-          <button type="button">Retour à l'accueil</button>
+          <button type="button">Retour à l&apos;accueil</button>
         </Link>
       </div>
     );
