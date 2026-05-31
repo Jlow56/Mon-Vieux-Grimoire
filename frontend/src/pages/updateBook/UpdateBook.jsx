@@ -36,7 +36,6 @@ function UpdateBook() {
   return (
     <div className="content-container">
       <BackArrow />
-      
       <div className={styles.Container}>
         {!created ? (
           <>
